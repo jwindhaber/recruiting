@@ -4,12 +4,13 @@ import com.example.recruiting.course.dto.CourseRegistrationDto;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static com.example.recruiting.course.dto.CourseRegistrationDto.RegistrationStatus.ENROLLED;
 import static java.util.Comparator.comparing;
 import static java.util.function.BinaryOperator.maxBy;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * @author juergen.windhaber
@@ -38,13 +39,13 @@ public class CourseRegistrationEvaluator {
     public static List<String> getAllCurrentValidCourseParticipantNames(List<CourseRegistrationDto> reservationEntries) {
 
         Collection<CourseRegistrationDto> currentRegistrations = reservationEntries.stream()
-                .collect(Collectors.toMap(CourseRegistrationDto::getCourseParticipantName, Function.identity(), maxBy(comparing(CourseRegistrationDto::getRegistrationDate))))
+                .collect(toMap(CourseRegistrationDto::getCourseParticipantName, identity(), maxBy(comparing(CourseRegistrationDto::getRegistrationDate))))
                 .values();
 
         List<String> currentValidRegistrations = currentRegistrations.stream()
                 .filter(registrations -> registrations.getRegistrationStatus() == ENROLLED)
                 .map(CourseRegistrationDto::getCourseParticipantName)
-                .collect(Collectors.toList());
+                .collect(toList());
 
         return currentValidRegistrations;
     }
