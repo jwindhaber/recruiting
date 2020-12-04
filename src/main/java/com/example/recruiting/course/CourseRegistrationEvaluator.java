@@ -1,9 +1,15 @@
 package com.example.recruiting.course;
 
 import com.example.recruiting.course.dto.CourseRegistrationDto;
-import org.apache.commons.lang3.NotImplementedException;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static com.example.recruiting.course.dto.CourseRegistrationDto.RegistrationStatus.ENROLLED;
+import static java.util.Comparator.comparing;
+import static java.util.function.BinaryOperator.maxBy;
 
 /**
  * @author juergen.windhaber
@@ -31,6 +37,15 @@ public class CourseRegistrationEvaluator {
 
     public static List<String> getAllCurrentValidCourseParticipantNames(List<CourseRegistrationDto> reservationEntries) {
 
-        throw new NotImplementedException("The body of this method is not implemented yet!");
+        Collection<CourseRegistrationDto> currentRegistrations = reservationEntries.stream()
+                .collect(Collectors.toMap(CourseRegistrationDto::getCourseParticipantName, Function.identity(), maxBy(comparing(CourseRegistrationDto::getRegistrationDate))))
+                .values();
+
+        List<String> currentValidRegistrations = currentRegistrations.stream()
+                .filter(registrations -> registrations.getRegistrationStatus() == ENROLLED)
+                .map(CourseRegistrationDto::getCourseParticipantName)
+                .collect(Collectors.toList());
+
+        return currentValidRegistrations;
     }
 }
